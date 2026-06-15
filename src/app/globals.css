@@ -1,49 +1,5 @@
 @import "tailwindcss";
 
-/* ============================================ */
-/* اضافه شدن فونت محلی Sora - فقط همین بخش اضافه شده */
-/* ============================================ */
-@font-face {
-  font-family: 'Sora';
-  src: url('/fonts/sora.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sora';
-  src: url('/fonts/sora.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sora';
-  src: url('/fonts/sora.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sora';
-  src: url('/fonts/sora.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sora';
-  src: url('/fonts/sora.otf') format('opentype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-/* ============================================ */
-
 @theme {
   --color-background: #0A0A0F;
   --color-background-subtle: #0F0F15;
@@ -146,11 +102,3 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
   }
 }
-
-/* ============================================ */
-/* اضافه شدن کلاس اختصاصی برای استفاده از فونت Sora در تیترها */
-/* ============================================ */
-h1, h2, h3, .sora-font {
-  font-family: 'Sora', var(--font-vazirmatn), system-ui, sans-serif;
-}
-/* ============================================ */
