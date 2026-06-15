@@ -1,4 +1,8 @@
-/* تعریف فونت Sora از فایل محلی */
+@import "tailwindcss";
+
+/* ============================================ */
+/* اضافه شدن فونت محلی Sora - فقط همین بخش اضافه شده */
+/* ============================================ */
 @font-face {
   font-family: 'Sora';
   src: url('/fonts/sora.otf') format('opentype');
@@ -38,34 +42,115 @@
   font-style: normal;
   font-display: swap;
 }
+/* ============================================ */
 
-/* تگ‌های تیتر با فونت Sora */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Sora', 'Vazirmatn', system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+@theme {
+  --color-background: #0A0A0F;
+  --color-background-subtle: #0F0F15;
+  --color-background-card: #15151E;
+  --color-surface: #1A1A24;
+  --color-surface-hover: #22222E;
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-primary: #9CB080;
+  --color-primary-light: #B2C49A;
+  --color-primary-dark: #7A8F60;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A0A0B0;
+  --color-text-tertiary: #6B6B7D;
+
+  --font-sans: var(--font-vazirmatn), system-ui, sans-serif;
 }
 
-/* متن معمولی با Vazirmatn (خوانایی بهتر) */
-body, p, li, span, .text-body {
-  font-family: 'Vazirmatn', 'Sora', system-ui, sans-serif;
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-background-subtle);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-text-tertiary);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-secondary);
+  }
 }
 
-/* کلاس اختصاصی برای تیترهای بزرگ */
-.hero-title {
-  font-family: 'Sora', 'Vazirmatn', sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+@layer components {
+  .neumorphic-card {
+    background: var(--color-background-card);
+    border-radius: 32px;
+    box-shadow: 
+      20px 20px 40px rgba(0, 0, 0, 0.4),
+      -8px -8px 16px rgba(255, 255, 255, 0.02),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  }
+
+  .neumorphic-button {
+    background: var(--color-background-card);
+    border-radius: 48px;
+    box-shadow: 
+      8px 8px 16px rgba(0, 0, 0, 0.3),
+      -4px -4px 8px rgba(255, 255, 255, 0.02),
+      inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+  }
+
+  .neumorphic-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      12px 12px 24px rgba(0, 0, 0, 0.4),
+      -6px -6px 12px rgba(255, 255, 255, 0.02);
+  }
+
+  .neumorphic-panel {
+    background: var(--color-background-card);
+    border-radius: 24px;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.02),
+      10px 10px 20px rgba(0, 0, 0, 0.3),
+      -5px -5px 10px rgba(255, 255, 255, 0.01);
+  }
 }
 
-/* دکمه‌ها */
-button, .btn {
-  font-family: 'Sora', 'Vazirmatn', sans-serif;
-  font-weight: 600;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  }
 }
 
-/* لینک‌ها و منو */
-nav, .nav-link {
-  font-family: 'Sora', 'Vazirmatn', sans-serif;
-  font-weight: 500;
+/* ============================================ */
+/* اضافه شدن کلاس اختصاصی برای استفاده از فونت Sora در تیترها */
+/* ============================================ */
+h1, h2, h3, .sora-font {
+  font-family: 'Sora', var(--font-vazirmatn), system-ui, sans-serif;
 }
+/* ============================================ */
