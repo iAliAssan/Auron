@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
-/* اضافه کردن فونت Space Grotesk از Google Fonts */
+/* ========== فونت Space Grotesk از Google Fonts ========== */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* ======================================================== */
 
-/* کلاس اختصاصی فقط برای کلمه AURON */
+/* ========== کلاس اختصاصی فقط برای کلمه AURON ========== */
 .auron-title {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   letter-spacing: -0.03em;
 }
-}
-/* ============================================ */
+/* ======================================================== */
 
 @theme {
   --color-background: #0A0A0F;
@@ -115,10 +115,8 @@
   }
 }
 
-/* ========== اعمال فونت Sora به تیترها ========== */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Sora', var(--font-vazirmatn), system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+/* ========== بهبود performance برای المان‌های متحرک ========== */
+.bg-primary, .bg-accent {
+  will-change: transform;
 }
-/* ============================================ */
+/* ========================================================= */
