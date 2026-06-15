@@ -1,28 +1,34 @@
-import { createClient } from '@/utils/supabase/server'
-import { cookies } from 'next/headers'
+'use client'
 
-export default async function TestSupabasePage() {
-  const cookieStore = await cookies()
-  const supabase = createClient(cookieStore)
+import { createClient } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
 
-  // تلاش برای اتصال و خواندن یک جدول ساده
-  const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true })
+export default function TestSupabase() {
+  const [status, setStatus] = useState('در حال اتصال...')
+
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+
+    if (!url || !key) {
+      setStatus('❌ متغیرهای محیطی تنظیم نشده‌اند')
+      return
+    }
+
+    const supabase = createClient(url, key)
+    supabase.from('users').select('count', { count: 'exact', head: true })
+      .then(({ error }) => {
+        if (error) setStatus('❌ خطا: ' + error.message)
+        else setStatus('✅ اتصال به Supabase برقرار است')
+      })
+      .catch(err => setStatus('❌ خطا: ' + err.message))
+  }, [])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-white p-8">
-      <div className="neumorphic-card p-8 max-w-md w-full text-center">
-        <h1 className="text-2xl font-bold mb-4">اتصال به Supabase</h1>
-        {error ? (
-          <div className="text-red-400">
-            <p>❌ خطا در اتصال</p>
-            <p className="text-sm mt-2">{error.message}</p>
-          </div>
-        ) : (
-          <div className="text-green-400">
-            <p>✅ اتصال برقرار است</p>
-            <p className="text-sm text-text-secondary mt-4">جدول 'users' آماده است</p>
-          </div>
-        )}
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="bg-gray-900 p-8 rounded-2xl text-white text-center">
+        <h1 className="text-2xl font-bold mb-4">تست اتصال Supabase</h1>
+        <p>{status}</p>
       </div>
     </div>
   )
