@@ -1,11 +1,7 @@
 name: Create Project Structure
 
 on:
-  workflow_dispatch:  # اجرای دستی
-  push:
-    branches: [ main ]
-    paths:
-      - '.github/workflows/create-structure.yml'
+  workflow_dispatch:  # فقط با کلیک دستی اجرا می‌شود
 
 jobs:
   create-structure:
@@ -13,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Create directory structure
+      - name: Create directories
         run: |
           mkdir -p src/app
           mkdir -p src/components
@@ -22,9 +18,8 @@ jobs:
           mkdir -p src/lib
           mkdir -p public
           
-      - name: Create all files with content
+      - name: Create layout.tsx
         run: |
-          # 1. app/layout.tsx
           cat > src/app/layout.tsx << 'EOF'
           import type { Metadata } from 'next'
           import { Vazirmatn } from 'next/font/google'
@@ -37,8 +32,8 @@ jobs:
           })
 
           export const metadata: Metadata = {
-            title: 'AURON',
-            description: 'Intelligent Systems',
+            title: 'AURON | Intelligent Systems',
+            description: 'سیستم‌های هوشمند برای دنیای متصل',
           }
 
           export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -53,7 +48,32 @@ jobs:
           }
           EOF
           
-          # 2. app/page.tsx
+      - name: Create globals.css
+        run: |
+          cat > src/app/globals.css << 'EOF'
+          @import "tailwindcss";
+          
+          @theme {
+            --color-background: #0A0A0F;
+            --color-primary: #9CB080;
+            --color-text-primary: #FFFFFF;
+            --color-text-secondary: #A0A0B0;
+          }
+          
+          body {
+            background-color: var(--color-background);
+            font-family: var(--font-vazirmatn), system-ui;
+          }
+          
+          .neumorphic-card {
+            background: #15151E;
+            border-radius: 32px;
+            box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.02);
+          }
+          EOF
+          
+      - name: Create page.tsx
+        run: |
           cat > src/app/page.tsx << 'EOF'
           'use client'
           import { Hero } from '@/components/Hero'
@@ -75,75 +95,261 @@ jobs:
           }
           EOF
           
-          # 3. globals.css
-          cat > src/app/globals.css << 'EOF'
-          @import "tailwindcss";
-          
-          @theme {
-            --color-background: #0A0A0F;
-            --color-primary: #9CB080;
-          }
-          
-          body {
-            background-color: var(--color-background);
-            font-family: var(--font-vazirmatn), system-ui;
-          }
-          EOF
-          
-          # 4. components/Hero.tsx (ساده شده)
+      - name: Create Hero.tsx
+        run: |
           cat > src/components/Hero.tsx << 'EOF'
           'use client'
           import { motion } from 'framer-motion'
-          
+          import { Container } from './Container'
+          import { Logo } from './Logo'
+
           export function Hero() {
             return (
               <section className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                  <motion.h1 
+                <Container className="text-center">
+                  <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-8xl font-bold"
+                    transition={{ duration: 0.8 }}
                   >
-                    آئوران
-                  </motion.h1>
-                  <p className="text-xl text-gray-400 mt-4">
-                    سیستم‌های هوشمند برای دنیای متصل
-                  </p>
-                </div>
+                    <div className="flex justify-center mb-8">
+                      <Logo />
+                    </div>
+                    <h1 className="text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter">
+                      آئوران
+                    </h1>
+                    <p className="text-xl md:text-2xl text-text-secondary mt-6">
+                      سیستم‌های هوشمند برای دنیای متصل
+                    </p>
+                    <div className="mt-12">
+                      <a href="#products" className="neumorphic-button inline-block px-8 py-4">
+                        مشاهده محصولات
+                      </a>
+                    </div>
+                  </motion.div>
+                </Container>
               </section>
             )
           }
           EOF
           
-          # 5. سایر فایل‌های کامپوننت (خلاصه - ادامه دارد)
-          echo "placeholder" > src/components/Philosophy.tsx
-          echo "placeholder" > src/components/BrandStatement.tsx
-          echo "placeholder" src/components/ProductSection.tsx
-          echo "placeholder" > src/components/Footer.tsx
-          echo "placeholder" > src/components/BackgroundEffects.tsx
-          echo "placeholder" > src/components/Logo.tsx
-          echo "placeholder" > src/components/Container.tsx
-          echo "placeholder" > src/components/MotionWrapper.tsx
+      - name: Create Philosophy.tsx
+        run: |
+          cat > src/components/Philosophy.tsx << 'EOF'
+          'use client'
+          import { useState } from 'react'
+          import { motion, AnimatePresence } from 'framer-motion'
+          import { Container } from './Container'
+
+          const items = [
+            { id: 'monitoring', title: 'پایش', description: 'جمع‌آوری و مشاهده داده‌ها در لحظه از تجهیزات و سنسورهای متصل.' },
+            { id: 'analysis', title: 'تحلیل', description: 'تبدیل داده‌های خام به اطلاعات قابل تصمیم‌گیری.' },
+            { id: 'control', title: 'کنترل', description: 'مدیریت تجهیزات و فرآیندها از هر مکان.' },
+            { id: 'intelligence', title: 'هوشمندسازی', description: 'ترکیب داده، تحلیل و اتوماسیون برای ایجاد سیستم‌های خودکار.' },
+          ]
+
+          export function Philosophy() {
+            const [expandedId, setExpandedId] = useState<string | null>(null)
+
+            return (
+              <section className="py-24">
+                <Container>
+                  <h2 className="text-4xl text-center mb-16">فلسفه</h2>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="neumorphic-card p-6 cursor-pointer"
+                        onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                      >
+                        <h3 className="text-2xl font-bold">{item.title}</h3>
+                        <AnimatePresence>
+                          {expandedId === item.id && (
+                            <motion.p
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="mt-4 text-text-secondary"
+                            >
+                              {item.description}
+                            </motion.p>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ))}
+                  </div>
+                </Container>
+              </section>
+            )
+          }
+          EOF
           
-          # 6. config files
-          echo "export const content = {}" > src/config/content.ts
+      - name: Create BrandStatement.tsx
+        run: |
+          cat > src/components/BrandStatement.tsx << 'EOF'
+          'use client'
+          import { motion } from 'framer-motion'
+          import { Container } from './Container'
+
+          export function BrandStatement() {
+            return (
+              <section className="py-24 min-h-[60vh] flex items-center">
+                <Container className="text-center">
+                  <motion.h2
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter"
+                  >
+                    فناوری زمانی ارزشمند است<br />که نامرئی باشد.
+                  </motion.h2>
+                </Container>
+              </section>
+            )
+          }
+          EOF
+          
+      - name: Create ProductSection.tsx
+        run: |
+          cat > src/components/ProductSection.tsx << 'EOF'
+          'use client'
+          import { motion } from 'framer-motion'
+          import { Container } from './Container'
+
+          export function ProductSection() {
+            return (
+              <section id="products" className="py-24">
+                <Container className="text-center">
+                  <h2 className="text-3xl text-text-secondary mb-12">محصولات</h2>
+                  <div className="neumorphic-card max-w-2xl mx-auto p-12">
+                    <h3 className="text-4xl font-bold mb-3">
+                      کشتیار
+                      <span className="text-text-tertiary text-xl mr-2">Keshtyar</span>
+                    </h3>
+                    <p className="text-text-secondary text-lg mb-8">
+                      سامانه هوشمند پایش و مدیریت مزرعه
+                    </p>
+                    <a href="#" className="neumorphic-button inline-block px-6 py-3">
+                      مشاهده محصول
+                    </a>
+                  </div>
+                </Container>
+              </section>
+            )
+          }
+          EOF
+          
+      - name: Create Footer.tsx
+        run: |
+          cat > src/components/Footer.tsx << 'EOF'
+          import { Container } from './Container'
+
+          export function Footer() {
+            return (
+              <footer className="border-t border-white/10 py-12 mt-24">
+                <Container className="text-center text-text-tertiary text-sm">
+                  <p>AURON | Intelligent Systems</p>
+                  <p className="mt-2">auron.ir | © ۱۴۰۵</p>
+                </Container>
+              </footer>
+            )
+          }
+          EOF
+          
+      - name: Create Logo.tsx
+        run: |
+          cat > src/components/Logo.tsx << 'EOF'
+          'use client'
+          import { motion } from 'framer-motion'
+
+          export function Logo() {
+            return (
+              <motion.div
+                animate={{ opacity: [1, 0.8, 1], scale: [1, 0.98, 1] }}
+                transition={{ duration: 4, repeat: Infinity }}
+              >
+                <svg width="64" height="64" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="20" stroke="#9CB080" strokeWidth="1.5" />
+                  <circle cx="24" cy="24" r="8" fill="#9CB080" opacity="0.3" />
+                  <circle cx="24" cy="24" r="2" fill="#9CB080" />
+                </svg>
+              </motion.div>
+            )
+          }
+          EOF
+          
+      - name: Create Container.tsx
+        run: |
+          cat > src/components/Container.tsx << 'EOF'
+          export function Container({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+            return (
+              <div className={`container mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
+                {children}
+              </div>
+            )
+          }
+          EOF
+          
+      - name: Create BackgroundEffects.tsx
+        run: |
+          cat > src/components/BackgroundEffects.tsx << 'EOF'
+          export function BackgroundEffects() {
+            return (
+              <div className="fixed inset-0 -z-10 overflow-hidden bg-noise">
+                <div className="absolute w-[800px] h-[800px] rounded-full bg-primary opacity-[0.03] blur-[120px] top-20 left-10" />
+                <div className="absolute w-[600px] h-[600px] rounded-full bg-accent opacity-[0.03] blur-[120px] bottom-20 right-10" />
+              </div>
+            )
+          }
+          EOF
+          
+      - name: Create config files
+        run: |
+          echo "export const branding = { name: 'AURON', namePersian: 'آئوران' }" > src/config/branding.ts
           echo "export const theme = {}" > src/config/theme.ts
           echo "export const typography = {}" > src/config/typography.ts
-          echo "export const branding = { name: 'AURON' }" > src/config/branding.ts
           echo "export const products = []" > src/config/products.ts
+          cat > src/config/content.ts << 'EOF'
+          export const content = {
+            hero: { title: 'آئوران', subtitle: 'سیستم‌های هوشمند\nبرای دنیای متصل', cta: 'مشاهده محصولات' },
+            philosophy: { title: 'فلسفه' },
+            brandStatement: { text: 'فناوری زمانی ارزشمند است\nکه نامرئی باشد.' },
+          }
+          EOF
           
-          # 7. hooks & lib
-          echo "export const useScrollReveal = () => {}" > src/hooks/useScrollReveal.ts
+      - name: Create placeholder files
+        run: |
+          echo "export const MotionWrapper = ({ children }) => <>{children}</>" > src/components/MotionWrapper.tsx
+          echo "export const useScrollReveal = () => ({ ref: null, isInView: true })" > src/hooks/useScrollReveal.ts
           echo "export const animations = {}" > src/lib/animations.ts
-          
-          # 8. public files (placeholder)
-          echo '<svg></svg>' > public/logo.svg
+          echo '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" stroke="#9CB080" stroke-width="2"/></svg>' > public/logo.svg
           touch public/favicon.ico
           
-      - name: Commit and push if changes
+      - name: Create package.json
+        run: |
+          cat > package.json << 'EOF'
+          {
+            "name": "auron-landing",
+            "version": "1.0.0",
+            "private": true,
+            "scripts": {
+              "dev": "next dev",
+              "build": "next build",
+              "start": "next start"
+            },
+            "dependencies": {
+              "next": "15.2.4",
+              "react": "^19.0.0",
+              "react-dom": "^19.0.0",
+              "framer-motion": "^12.4.7",
+              "tailwindcss": "^4.0.0"
+            }
+          }
+          EOF
+          
+      - name: Commit and push
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add src/ public/
-          git diff --cached --quiet || git commit -m "chore: auto-create project structure"
+          git add .
+          git diff --cached --quiet || git commit -m "chore: create project structure"
           git push
