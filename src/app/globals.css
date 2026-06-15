@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
-/* ========== فونت Space Grotesk از Google Fonts با Import صحیح ========== */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+/* ========== فونت Space Grotesk از Google Fonts ========== */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-/* اعمال فونت به کل سایت */
-html, body, * {
-  font-family: 'Space Grotesk', 'Vazirmatn', system-ui, sans-serif !important;
+/* کلاس اختصاصی فقط برای کلمه AURON */
+.auron-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 @theme {
@@ -37,6 +39,7 @@ html, body, * {
   }
 
   body {
+    font-family: var(--font-sans);
     background-color: var(--color-background);
     color: var(--color-text-primary);
     line-height: 1.6;
