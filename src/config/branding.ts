@@ -1,5 +1,5 @@
 export const branding = {
-  name: 'آئوران',
+  name: 'Auron',
   namePersian: 'آئوران',
   tagline: 'سیستم‌های هوشمند برای دنیای متصل',
   description: 'فناوری زمانی ارزشمند است که نامرئی باشد.',
