@@ -1,8 +1,73 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="24" cy="24" r="20" stroke="#9CB080" stroke-width="1.5" fill="none"/>
-  <circle cx="24" cy="24" r="14" stroke="#9CB080" stroke-width="1" fill="none" opacity="0.5"/>
-  <circle cx="24" cy="24" r="8" fill="#9CB080" opacity="0.3"/>
-  <path d="M24 4 L24 8 M24 40 L24 44 M4 24 L8 24 M40 24 L44 24" stroke="#9CB080" stroke-width="1.5" stroke-linecap="round"/>
-  <path d="M8.5 8.5 L11.5 11.5 M36.5 36.5 L39.5 39.5" stroke="#9CB080" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-  <circle cx="24" cy="24" r="2" fill="#9CB080"/>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1000 1000">
+
+  <rect width="1000" height="1000" fill="#000000"/>
+
+  <!-- قاب اصلی سفید -->
+  <path fill="#FDFDFD"
+        d="
+        M500 180
+        L700 180
+        Q770 180 810 240
+        L900 400
+        Q940 470 900 540
+        L810 700
+        Q770 760 700 760
+        L300 760
+        Q230 760 190 700
+        L100 540
+        Q60 470 100 400
+        L190 240
+        Q230 180 300 180
+        Z"/>
+
+  <!-- اشکال خاکستری -->
+  <circle cx="500" cy="250" r="55" fill="#6B6C70"/>
+  <circle cx="700" cy="350" r="65" fill="#6B6C70"/>
+  <circle cx="300" cy="450" r="70" fill="#6B6C70"/>
+  <circle cx="620" cy="600" r="75" fill="#6B6C70"/>
+  <circle cx="400" cy="680" r="60" fill="#6B6C70"/>
+
+  <path fill="#6B6C70"
+        d="
+        M230 300
+        Q280 250 340 280
+        Q380 320 340 360
+        Q270 390 220 350
+        Z"/>
+
+  <path fill="#6B6C70"
+        d="
+        M650 250
+        Q720 210 780 250
+        Q820 300 770 340
+        Q700 350 640 310
+        Z"/>
+
+  <path fill="#6B6C70"
+        d="
+        M250 550
+        Q320 500 390 540
+        Q420 620 350 650
+        Q280 640 240 600
+        Z"/>
+
+  <!-- شبکه سفید داخلی -->
+  <g fill="none"
+     stroke="#FDFDFD"
+     stroke-width="18"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+    <path d="M280 280 L720 280"/>
+    <path d="M210 430 L760 430"/>
+    <path d="M260 620 L720 620"/>
+
+    <path d="M350 220 L350 720"/>
+    <path d="M620 220 L620 720"/>
+
+    <path d="M220 350 L760 650"/>
+    <path d="M760 350 L240 650"/>
+  </g>
+
 </svg>
