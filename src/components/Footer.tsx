@@ -21,7 +21,10 @@ export function Footer() {
           </div>
 
           <div className="text-center text-text-tertiary text-sm">
-            <p>{branding.name}.ir</p>
+            <p className="text-xs">
+              Designed &amp; Developed with ☕, code, and a little bit of obsession by Ali Assan
+            </p>
+            <p className="mt-1">{branding.name}.ir</p>
             <p>© {content.footer.copyright}</p>
           </div>
         </div>
