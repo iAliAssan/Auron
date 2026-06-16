@@ -3,6 +3,6 @@ export const branding = {
   namePersian: 'آئوران',
   tagline: 'سیستم‌های هوشمند برای دنیای متصل',
   description: 'فناوری زمانی ارزشمند است که نامرئی باشد.',
-  siteTitle: 'AURON | سیستم‌های هوشمند',
+  siteTitle: 'آئوران | سیستم‌های هوشمند',
   logoPath: '/logo.svg',
 } as const
