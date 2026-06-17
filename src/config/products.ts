@@ -11,7 +11,7 @@ export interface Product {
 export const products: Product[] = [
   {
     id: 'keshtyar',
-    name: 'کشتیار',
+    name: 'کشت‌یار',
     nameEn: '',  // ← خالی شد (انگلیسی حذف شد)
     description: 'سامانه هوشمند پایش و مدیریت مزرعه',
     link: 'https://keshtyar.auron.ir',
