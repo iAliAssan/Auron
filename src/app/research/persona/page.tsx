@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Container } from '@/components/Container';
 import { createClient } from '@/lib/supabase';
 
-// ==================== تایپ‌ها ====================
 type Answer = string | number | string[];
 
 interface Question {
@@ -212,7 +211,6 @@ function analyzeAnswers(answers: Record<number, Answer>, userName: string): Pers
   };
 }
 
-// ==================== کامپوننت اصلی ====================
 export default function PersonaPage() {
   const [step, setStep] = useState<'questions' | 'result'>('questions');
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -236,7 +234,6 @@ export default function PersonaPage() {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // پایان پرسشنامه - تحلیل و ذخیره در دیتابیس
       const result = analyzeAnswers(newAnswers, userName);
       setPersona(result);
       saveToDatabase(newAnswers, userName, result);
@@ -324,10 +321,9 @@ export default function PersonaPage() {
   const isMulti = q?.type === 'multi';
   const currentMultiAnswers = (answers[q?.id] as string[]) || [];
 
-  // ==================== رندر پرسشنامه ====================
   if (step === 'questions' && q) {
     return (
-      <main className="min-h-screen bg-background pt-24 pb-16 flex items-center justify-center">
+      <main className="min-h-screen bg-background pt-32 pb-16 flex items-center justify-center">
         <Container>
           <div className="max-w-2xl mx-auto">
             <div className="mb-8 text-center">
@@ -446,10 +442,9 @@ export default function PersonaPage() {
     );
   }
 
-  // ==================== رندر نتیجه ====================
   if (step === 'result' && persona) {
     return (
-      <main className="min-h-screen bg-background pt-24 pb-16">
+      <main className="min-h-screen bg-background pt-32 pb-16">
         <Container>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -624,12 +619,12 @@ export default function PersonaPage() {
               >
                 🔄 شروع مجدد
               </button>
-              <a
-                href="/"
-                className="px-6 py-3 rounded-xl bg-primary text-background font-medium hover:bg-primary/90 transition-all"
+              <Link
+                href="/research"
+                className="px-6 py-3 rounded-xl border border-border hover:border-primary hover:bg-primary/5 transition-all text-text-secondary hover:text-text-primary"
               >
-                🏠 بازگشت به صفحه اصلی
-              </a>
+                ← بازگشت به تحقیق و توسعه
+              </Link>
             </div>
           </motion.div>
         </Container>
