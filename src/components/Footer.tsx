@@ -31,7 +31,7 @@ export function Footer() {
 
           {/* تحقیق و توسعه */}
           <Link
-            href="/persona"
+            href="/research"
             className="group relative mt-2 px-6 py-2 text-sm rounded-full border border-primary/30 text-text-secondary hover:text-text-primary hover:border-primary transition-all duration-300"
           >
             <span className="relative z-10">🔬 تحقیق و توسعه</span>
