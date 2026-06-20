@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Container } from '@/components/Container';
+import { createClient } from '@/lib/supabase';
 
 // ==================== تایپ‌ها ====================
 type Answer = string | number | string[];
@@ -10,7 +11,7 @@ type Answer = string | number | string[];
 interface Question {
   id: number;
   text: string;
-  type: 'single' | 'multi' | 'text' | 'number' | 'range';
+  type: 'single' | 'multi' | 'text' | 'number' | 'range' | 'name';
   options?: string[];
 }
 
@@ -31,6 +32,11 @@ interface PersonaResult {
 
 // ==================== سوالات ====================
 const questions: Question[] = [
+  {
+    id: 0,
+    text: 'لطفاً نام خود را وارد کنید',
+    type: 'name',
+  },
   {
     id: 1,
     text: 'سن شما در کدام بازه قرار دارد؟',
@@ -62,9 +68,9 @@ const questions: Question[] = [
   },
   {
     id: 6,
-    text: 'در حال حاضر وضعیت مزرعه را چگونه پایش می‌کنید؟',
-    type: 'single',
-    options: ['مراجعه حضوری', 'تماس با کارگران', 'سنسورها و تجهیزات دیجیتال', 'روش‌های دیگر'],
+    text: 'در حال حاضر وضعیت مزرعه را چگونه پایش می‌کنید؟ (چند گزینه)',
+    type: 'multi',
+    options: ['مراجعه حضوری', 'تماس با کارگران', 'سنسورها و تجهیزات دیجیتال', 'دوربین‌های مداربسته', 'روش‌های دیگر'],
   },
   {
     id: 7,
@@ -94,9 +100,9 @@ const questions: Question[] = [
   },
   {
     id: 12,
-    text: 'مهم‌ترین اطلاعاتی که دوست دارید مشاهده کنید چیست؟',
+    text: 'مهم‌ترین اطلاعاتی که دوست دارید مشاهده کنید چیست؟ (چند گزینه)',
     type: 'multi',
-    options: ['رطوبت خاک', 'دما', 'وضعیت آبیاری', 'مصرف آب', 'وضعیت تجهیزات', 'سایر'],
+    options: ['رطوبت خاک', 'دما و رطوبت هوا', 'وضعیت آبیاری', 'مصرف آب', 'وضعیت تجهیزات', 'پیش‌بینی آب و هوا', 'سایر'],
   },
   {
     id: 13,
@@ -117,13 +123,13 @@ const questions: Question[] = [
 ];
 
 // ==================== تحلیل پاسخ‌ها ====================
-function analyzeAnswers(answers: Record<number, Answer>): PersonaResult {
+function analyzeAnswers(answers: Record<number, Answer>, userName: string): PersonaResult {
   const age = answers[1] as string || 'نامشخص';
   const job = answers[2] as string || 'نامشخص';
   const ownership = answers[3] as string || '';
   const landSize = answers[4] as string || '';
   const activity = answers[5] as string || '';
-  const currentMethod = answers[6] as string || '';
+  const currentMethod = answers[6] as string[] || [];
   const mainProblem = answers[7] as string || '';
   const visitCount = answers[8] as string || '';
   const usedSmart = answers[9] as string || 'خیر';
@@ -134,15 +140,13 @@ function analyzeAnswers(answers: Record<number, Answer>): PersonaResult {
   const importantFactor = answers[14] as string || '';
   const extraFeature = answers[15] as string || '';
 
-  // تعیین سطح فناوری
   let techLevel = 'پایین';
   if (usedSmart === 'بله' || remoteControl >= 4 || realtimeData >= 4) {
     techLevel = 'بالا';
-  } else if (remoteControl >= 3 || realtimeData >= 3 || currentMethod.includes('سنسور')) {
+  } else if (remoteControl >= 3 || realtimeData >= 3 || currentMethod.some(m => m.includes('سنسور') || m.includes('دوربین'))) {
     techLevel = 'متوسط';
   }
 
-  // تعیین میزان پذیرش فناوری
   let techAdoption = 'پایین';
   if (adoptionLikelihood >= 4 || remoteControl >= 4 || realtimeData >= 4) {
     techAdoption = 'بالا';
@@ -150,34 +154,31 @@ function analyzeAnswers(answers: Record<number, Answer>): PersonaResult {
     techAdoption = 'متوسط';
   }
 
-  // اهداف بر اساس پاسخ‌ها
   const goals: string[] = [];
   if (landSize.includes('بیش از') || landSize.includes('5 تا')) goals.push('مدیریت بهتر مزرعه بزرگ');
-  if (importantInfo.includes('رطوبت خاک') || importantInfo.includes('وضعیت آبیاری')) goals.push('بهبود مدیریت آبیاری');
+  if (importantInfo.some(i => i.includes('رطوبت') || i.includes('آبیاری'))) goals.push('بهبود مدیریت آبیاری');
   if (realtimeData >= 4) goals.push('دسترسی به داده‌های لحظه‌ای');
   if (remoteControl >= 4) goals.push('کنترل تجهیزات از راه دور');
   if (adoptionLikelihood >= 4) goals.push('کاهش هزینه و زمان مدیریت');
   if (goals.length === 0) goals.push('بهبود کلی مدیریت مزرعه');
 
-  // چالش‌ها
   const challenges: string[] = [];
   if (mainProblem) challenges.push(mainProblem);
   if (ownership === 'خیر') challenges.push('نبود مالکیت مستقیم بر مزرعه');
   if (visitCount && Number(visitCount) < 3) challenges.push('سر زدن محدود به مزرعه');
-  if (currentMethod === 'مراجعه حضوری') challenges.push('نیاز به حضور فیزیکی');
+  if (currentMethod.includes('مراجعه حضوری')) challenges.push('نیاز به حضور فیزیکی');
   if (landSize.includes('بیش از')) challenges.push('وسعت زیاد مزرعه');
   if (challenges.length === 0) challenges.push('نیاز به بهبود فرآیندهای مدیریتی');
 
-  // نیازها
   const needs: string[] = [];
   if (realtimeData >= 4) needs.push('پایش لحظه‌ای');
   if (remoteControl >= 4) needs.push('کنترل از راه دور');
-  if (importantInfo.includes('رطوبت خاک')) needs.push('اطلاع از رطوبت خاک');
-  if (importantInfo.includes('وضعیت آبیاری')) needs.push('مدیریت هوشمند آبیاری');
-  if (importantInfo.includes('مصرف آب')) needs.push('مدیریت مصرف آب');
+  if (importantInfo.some(i => i.includes('رطوبت'))) needs.push('اطلاع از رطوبت خاک');
+  if (importantInfo.some(i => i.includes('آبیاری'))) needs.push('مدیریت هوشمند آبیاری');
+  if (importantInfo.some(i => i.includes('مصرف'))) needs.push('مدیریت مصرف آب');
+  if (importantInfo.some(i => i.includes('پیش‌بینی'))) needs.push('پیش‌بینی آب و هوا');
   if (needs.length === 0) needs.push('دسترسی به اطلاعات دقیق مزرعه');
 
-  // انگیزه‌ها
   const motivations: string[] = [];
   if (adoptionLikelihood >= 4) motivations.push('کاهش هزینه‌ها');
   if (remoteControl >= 4) motivations.push('راحتی و صرفه‌جویی در زمان');
@@ -186,14 +187,6 @@ function analyzeAnswers(answers: Record<number, Answer>): PersonaResult {
   if (importantFactor === 'سادگی استفاده') motivations.push('استفاده آسان');
   if (motivations.length === 0) motivations.push('بهبود کارایی مزرعه');
 
-  // نام فرضی
-  let name = 'علی رضایی';
-  if (ownership === 'مدیر یا ناظر مزرعه') name = 'رضا کریمی';
-  else if (activity === 'گلخانه') name = 'محمد حسینی';
-  else if (activity === 'دامداری') name = 'حسین محمدی';
-  else if (landSize.includes('بیش از')) name = 'عباس احمدی';
-
-  // نقل قول
   const quotes = [
     'دوست دارم همه چیز رو از راه دور کنترل کنم و دیگه نگران نباشم.',
     'وقت و هزینه زیادی صرف سرکشی به مزرعه می‌کنم، باید راهی پیدا کنم.',
@@ -204,7 +197,7 @@ function analyzeAnswers(answers: Record<number, Answer>): PersonaResult {
   const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
   return {
-    name,
+    name: userName || 'کاربر گرامی',
     age,
     job,
     activity: activity || 'کشاورزی',
@@ -213,7 +206,7 @@ function analyzeAnswers(answers: Record<number, Answer>): PersonaResult {
     challenges,
     needs,
     motivations,
-    workBehavior: currentMethod || 'مراجعه حضوری و بررسی مستقیم',
+    workBehavior: currentMethod.join('، ') || 'مراجعه حضوری و بررسی مستقیم',
     techAdoption,
     quote,
   };
@@ -224,32 +217,93 @@ export default function PersonaPage() {
   const [step, setStep] = useState<'questions' | 'result'>('questions');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, Answer>>({});
+  const [userName, setUserName] = useState('');
   const [persona, setPersona] = useState<PersonaResult | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const supabase = createClient();
 
   const handleAnswer = (value: Answer) => {
     const q = questions[currentQuestion];
     const newAnswers = { ...answers, [q.id]: value };
     setAnswers(newAnswers);
 
+    if (currentQuestion === 0 && q.type === 'name') {
+      setUserName(value as string);
+    }
+
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // تحلیل و نمایش نتیجه
-      const result = analyzeAnswers(newAnswers);
+      // پایان پرسشنامه - تحلیل و ذخیره در دیتابیس
+      const result = analyzeAnswers(newAnswers, userName);
       setPersona(result);
+      saveToDatabase(newAnswers, userName, result);
       setStep('result');
     }
   };
 
-  const handleSingleChoice = (option: string) => {
-    if (questions[currentQuestion].type === 'single') {
-      handleAnswer(option);
-    } else if (questions[currentQuestion].type === 'multi') {
-      const current = (answers[questions[currentQuestion].id] as string[]) || [];
-      if (current.includes(option)) {
-        handleAnswer(current.filter((i: string) => i !== option));
+  const saveToDatabase = async (answersData: Record<number, Answer>, name: string, personaData: PersonaResult) => {
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from('persona_responses').insert({
+        user_name: name,
+        age: answersData[1] as string || '',
+        job: answersData[2] as string || '',
+        ownership: answersData[3] as string || '',
+        land_size: answersData[4] as string || '',
+        activity: answersData[5] as string || '',
+        monitoring_methods: answersData[6] as string[] || [],
+        main_problem: answersData[7] as string || '',
+        visit_count: answersData[8] as string || '',
+        used_smart: answersData[9] as string || '',
+        remote_control: Number(answersData[10]) || 0,
+        realtime_data: Number(answersData[11]) || 0,
+        important_info: answersData[12] as string[] || [],
+        adoption_likelihood: Number(answersData[13]) || 0,
+        important_factor: answersData[14] as string || '',
+        extra_feature: answersData[15] as string || '',
+        persona_result: personaData,
+      });
+
+      if (error) {
+        console.error('❌ خطا در ذخیره:', error);
+        setError('خطا در ذخیره پاسخ‌ها. لطفاً دوباره تلاش کنید.');
       } else {
-        handleAnswer([...current, option]);
+        console.log('✅ پاسخ‌ها با موفقیت ذخیره شدند');
+      }
+    } catch (err) {
+      console.error('❌ خطا:', err);
+      setError('خطا در ارتباط با سرور.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleMultiToggle = (option: string) => {
+    const q = questions[currentQuestion];
+    const current = (answers[q.id] as string[]) || [];
+    let newMulti;
+    if (current.includes(option)) {
+      newMulti = current.filter((i: string) => i !== option);
+    } else {
+      newMulti = [...current, option];
+    }
+    setAnswers({ ...answers, [q.id]: newMulti });
+  };
+
+  const confirmMulti = () => {
+    const q = questions[currentQuestion];
+    const current = (answers[q.id] as string[]) || [];
+    if (current.length > 0) {
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+      } else {
+        const result = analyzeAnswers(answers, userName);
+        setPersona(result);
+        saveToDatabase(answers, userName, result);
+        setStep('result');
       }
     }
   };
@@ -266,13 +320,6 @@ export default function PersonaPage() {
     handleAnswer(value);
   };
 
-  const resetQuiz = () => {
-    setStep('questions');
-    setCurrentQuestion(0);
-    setAnswers({});
-    setPersona(null);
-  };
-
   const q = questions[currentQuestion];
   const isMulti = q?.type === 'multi';
   const currentMultiAnswers = (answers[q?.id] as string[]) || [];
@@ -283,7 +330,6 @@ export default function PersonaPage() {
       <main className="min-h-screen bg-background pt-24 pb-16 flex items-center justify-center">
         <Container>
           <div className="max-w-2xl mx-auto">
-            {/* Progress */}
             <div className="mb-8 text-center">
               <div className="flex justify-between text-sm text-text-tertiary mb-2">
                 <span>سوال {currentQuestion + 1} از {questions.length}</span>
@@ -297,7 +343,6 @@ export default function PersonaPage() {
               </div>
             </div>
 
-            {/* Question */}
             <motion.div
               key={q.id}
               initial={{ opacity: 0, x: 20 }}
@@ -307,13 +352,26 @@ export default function PersonaPage() {
             >
               <h2 className="text-xl md:text-2xl font-bold text-text-primary mb-6">{q.text}</h2>
 
-              {/* Single Choice */}
+              {q.type === 'name' && (
+                <form onSubmit={handleTextSubmit} className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="نام و نام خانوادگی..."
+                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-text-primary focus:outline-none focus:border-primary transition-all"
+                    autoFocus
+                  />
+                  <button type="submit" className="px-6 py-2 rounded-xl bg-primary text-background font-medium hover:bg-primary/90 transition-all">
+                    تأیید
+                  </button>
+                </form>
+              )}
+
               {q.type === 'single' && q.options && (
                 <div className="space-y-3">
                   {q.options.map((opt) => (
                     <button
                       key={opt}
-                      onClick={() => handleSingleChoice(opt)}
+                      onClick={() => handleAnswer(opt)}
                       className="w-full text-right px-4 py-3 rounded-xl border border-border hover:border-primary hover:bg-primary/5 transition-all"
                     >
                       {opt}
@@ -322,13 +380,12 @@ export default function PersonaPage() {
                 </div>
               )}
 
-              {/* Multi Choice */}
               {q.type === 'multi' && q.options && (
                 <div className="space-y-3">
                   {q.options.map((opt) => (
                     <button
                       key={opt}
-                      onClick={() => handleSingleChoice(opt)}
+                      onClick={() => handleMultiToggle(opt)}
                       className={`w-full text-right px-4 py-3 rounded-xl border transition-all ${
                         currentMultiAnswers.includes(opt)
                           ? 'border-primary bg-primary/10 text-primary'
@@ -340,7 +397,7 @@ export default function PersonaPage() {
                   ))}
                   {currentMultiAnswers.length > 0 && (
                     <button
-                      onClick={() => handleAnswer(currentMultiAnswers)}
+                      onClick={confirmMulti}
                       className="w-full mt-4 px-4 py-3 rounded-xl bg-primary text-background font-medium hover:bg-primary/90 transition-all"
                     >
                       تأیید و ادامه
@@ -349,7 +406,6 @@ export default function PersonaPage() {
                 </div>
               )}
 
-              {/* Text */}
               {q.type === 'text' && (
                 <form onSubmit={handleTextSubmit} className="space-y-4">
                   <input
@@ -358,16 +414,12 @@ export default function PersonaPage() {
                     className="w-full px-4 py-3 rounded-xl bg-background border border-border text-text-primary focus:outline-none focus:border-primary transition-all"
                     autoFocus
                   />
-                  <button
-                    type="submit"
-                    className="px-6 py-2 rounded-xl bg-primary text-background font-medium hover:bg-primary/90 transition-all"
-                  >
+                  <button type="submit" className="px-6 py-2 rounded-xl bg-primary text-background font-medium hover:bg-primary/90 transition-all">
                     تأیید
                   </button>
                 </form>
               )}
 
-              {/* Range */}
               {q.type === 'range' && (
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm text-text-tertiary">
@@ -399,19 +451,16 @@ export default function PersonaPage() {
     return (
       <main className="min-h-screen bg-background pt-24 pb-16">
         <Container>
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">
-              🎯 پرسونای مشتری کشت‌یار
-            </h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">🎯 پرسونای مشتری کشت‌یار</h1>
             <p className="text-text-tertiary">بر اساس پاسخ‌های شما</p>
+            {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
           </motion.div>
 
-          {/* Persona Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -520,7 +569,6 @@ export default function PersonaPage() {
             </div>
           </motion.div>
 
-          {/* جمع‌بندی */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -528,9 +576,7 @@ export default function PersonaPage() {
             className="max-w-4xl mx-auto mt-8"
           >
             <div className="bg-surface border border-border rounded-2xl p-6 md:p-8 shadow-[8px_8px_16px_rgba(0,0,0,0.3),-4px_-4px_8px_rgba(255,255,255,0.02)]">
-              <h2 className="text-2xl font-bold text-text-primary text-center mb-4">
-                📊 جمع‌بندی و پیشنهاد برای توسعه کشت‌یار
-              </h2>
+              <h2 className="text-2xl font-bold text-text-primary text-center mb-4">📊 جمع‌بندی و پیشنهاد برای توسعه کشت‌یار</h2>
               <div className="space-y-4 text-text-secondary text-base leading-relaxed">
                 <p>
                   بر اساس تحلیل پاسخ‌ها، این مشتری به عنوان <span className="text-text-primary font-medium">{persona.name}</span> 
@@ -571,13 +617,19 @@ export default function PersonaPage() {
               </div>
             </div>
 
-            <div className="text-center mt-8">
+            <div className="text-center mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={resetQuiz}
+                onClick={() => window.location.reload()}
                 className="px-6 py-3 rounded-xl border border-border hover:border-primary hover:bg-primary/5 transition-all text-text-secondary hover:text-text-primary"
               >
-                🔄 شروع مجدد پرسشنامه
+                🔄 شروع مجدد
               </button>
+              <a
+                href="/"
+                className="px-6 py-3 rounded-xl bg-primary text-background font-medium hover:bg-primary/90 transition-all"
+              >
+                🏠 بازگشت به صفحه اصلی
+              </a>
             </div>
           </motion.div>
         </Container>
