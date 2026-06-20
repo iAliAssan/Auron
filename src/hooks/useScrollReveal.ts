@@ -1,16 +1,27 @@
-import { useEffect, useRef, useState } from 'react'
-import { useInView } from 'framer-motion'
+import { useEffect } from 'react';
 
 export function useScrollReveal() {
-  const ref = useRef<HTMLElement>(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
-  const [hasRevealed, setHasRevealed] = useState(false)
-
   useEffect(() => {
-    if (isInView && !hasRevealed) {
-      setHasRevealed(true)
-    }
-  }, [isInView, hasRevealed])
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            // برای انیمیشن‌های تکراری، این خط را فعال کن:
+            // observer.unobserve(entry.target);
+          }
+        });
+      },
+      { 
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px' // کمی زودتر فعال شود
+      }
+    );
 
-  return { ref, isInView: hasRevealed }
+    // تمام المان‌های دارای کلاس reveal و reveal-* را پیدا کن
+    const elements = document.querySelectorAll('.reveal, [class*="reveal-"]');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
 }
