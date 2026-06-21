@@ -44,6 +44,10 @@ export interface ProductConfig {
     items: ProductApplication[];
   };
   dashboard: ProductDashboard;
+  summary: {
+    title: string;
+    description: string;
+  };
   faq: ProductFAQ[];
   seo: {
     title: string;
