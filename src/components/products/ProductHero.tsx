@@ -50,8 +50,6 @@ export function ProductHero({ config }: ProductHeroProps) {
                 className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
                   cta.variant === 'primary'
                     ? 'bg-primary text-background hover:bg-primary/90 hover:scale-105'
-                    : cta.variant === 'secondary'
-                    ? 'bg-surface text-text-primary border border-border hover:bg-primary/10 hover:border-primary'
                     : 'border border-border text-text-secondary hover:text-text-primary hover:border-primary hover:bg-primary/5'
                 }`}
               >
