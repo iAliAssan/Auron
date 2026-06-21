@@ -1,12 +1,25 @@
 export interface ProductFeature {
   title: string;
   description: string;
-  icon: string;
+  icon: string; // نام آیکون Lucide
 }
 
-export interface ProductWhy {
+export interface ProductApplication {
   title: string;
-  items: string[];
+  description: string;
+  icon: string; // نام آیکون Lucide
+}
+
+export interface ProductFAQ {
+  question: string;
+  answer: string;
+}
+
+export interface ProductDashboard {
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
 }
 
 export interface ProductCTA {
@@ -26,11 +39,12 @@ export interface ProductConfig {
     description: string;
   };
   features: ProductFeature[];
-  why: ProductWhy;
-  summary: {
+  applications: {
     title: string;
-    description: string;
+    items: ProductApplication[];
   };
+  dashboard: ProductDashboard;
+  faq: ProductFAQ[];
   seo: {
     title: string;
     description: string;
