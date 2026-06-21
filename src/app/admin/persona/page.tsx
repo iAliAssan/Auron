@@ -3,15 +3,22 @@
 import { useState, useEffect } from 'react';
 import { Container } from '@/components/Container';
 import { createClient } from '@/lib/supabase';
+import Link from 'next/link';
 
 export default function AdminPersonaPage() {
+  const [password, setPassword] = useState('');
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [responses, setResponses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
+  const ADMIN_PASSWORD = 'keshtyar2025';
+
   useEffect(() => {
-    fetchResponses();
-  }, []);
+    if (isAuthorized) {
+      fetchResponses();
+    }
+  }, [isAuthorized]);
 
   const fetchResponses = async () => {
     const { data, error } = await supabase
@@ -25,9 +32,46 @@ export default function AdminPersonaPage() {
     setLoading(false);
   };
 
+  if (!isAuthorized) {
+    return (
+      <main className="min-h-screen bg-background pt-32 pb-16 flex items-center justify-center">
+        <Container>
+          <div className="max-w-md mx-auto bg-surface border border-border rounded-2xl p-8 shadow-[8px_8px_16px_rgba(0,0,0,0.3)]">
+            <h2 className="text-2xl font-bold text-text-primary text-center mb-6">🔒 ورود به صفحه مدیریت</h2>
+            <input
+              type="password"
+              placeholder="رمز عبور را وارد کنید"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-background border border-border text-text-primary focus:outline-none focus:border-primary transition-all mb-4"
+              onKeyDown={(e) => e.key === 'Enter' && setIsAuthorized(password === ADMIN_PASSWORD)}
+            />
+            <button
+              onClick={() => setIsAuthorized(password === ADMIN_PASSWORD)}
+              className="w-full px-6 py-3 rounded-xl bg-primary text-background font-medium hover:bg-primary/90 transition-all"
+            >
+              ورود
+            </button>
+            {password && password !== ADMIN_PASSWORD && (
+              <p className="text-red-400 text-sm text-center mt-3">رمز عبور اشتباه است</p>
+            )}
+            <div className="text-center mt-4">
+              <Link
+                href="/research"
+                className="text-sm text-text-tertiary hover:text-primary transition-colors"
+              >
+                ← بازگشت به تحقیق و توسعه
+              </Link>
+            </div>
+          </div>
+        </Container>
+      </main>
+    );
+  }
+
   if (loading) {
     return (
-      <main className="min-h-screen bg-background pt-24 pb-16">
+      <main className="min-h-screen bg-background pt-32 pb-16">
         <Container>
           <div className="text-center text-text-secondary">در حال بارگذاری...</div>
         </Container>
@@ -36,11 +80,19 @@ export default function AdminPersonaPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background pt-24 pb-16">
+    <main className="min-h-screen bg-background pt-32 pb-16">
       <Container>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-text-primary">📋 پاسخ‌های پرسشنامه</h1>
-          <span className="text-text-tertiary text-sm">تعداد: {responses.length}</span>
+          <div className="flex items-center gap-4">
+            <span className="text-text-tertiary text-sm">تعداد: {responses.length}</span>
+            <Link
+              href="/research"
+              className="text-sm text-text-tertiary hover:text-primary transition-colors"
+            >
+              ← بازگشت
+            </Link>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -101,7 +153,6 @@ export default function AdminPersonaPage() {
                 </div>
               </div>
 
-              {/* Persona Result */}
               {resp.persona_result && (
                 <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-xl">
                   <p className="text-sm text-text-secondary">
