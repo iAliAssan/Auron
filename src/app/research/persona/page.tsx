@@ -1,9 +1,10 @@
-'use client';
+''use client';
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '@/components/Container';
 import { createClient } from '@/lib/supabase';
+import Link from 'next/link';
 
 type Answer = string | number | string[];
 
