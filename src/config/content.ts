@@ -2,7 +2,10 @@ export const content = {
   hero: {
     title: 'آئوران',
     subtitle: 'سیستم‌های هوشمند\nبرای دنیای متصل',
-    cta: 'مشاهده محصولات',
+
+    // تغییر مهم: هماهنگ با Hero جدید
+    ctaPrimary: 'مشاهده محصولات',
+    ctaSecondary: 'آشنایی بیشتر',
   },
 
   philosophy: {
