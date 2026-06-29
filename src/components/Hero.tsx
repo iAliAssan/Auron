@@ -21,7 +21,6 @@ export function Hero() {
             <Logo />
           </motion.div>
 
-          {/* فقط این خط تغییر کرده - کلاس auron-title اضافه شده */}
           <motion.h1
             variants={fadeInUp}
             className="auron-title text-7xl sm:text-8xl md:text-9xl font-black tracking-tighter mb-6 bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent"
@@ -36,25 +35,17 @@ export function Hero() {
             {content.hero.subtitle}
           </motion.p>
 
-          <motion.div variants={fadeInUp} className="mt-12 flex gap-4 justify-center">
+          <motion.div variants={fadeInUp} className="mt-12">
             <a
               href="#products"
               className="neumorphic-button inline-block px-8 py-4 text-lg font-medium text-text-primary hover:text-primary transition-colors duration-300"
             >
               {content.hero.ctaPrimary}
             </a>
-
-            <a
-              href="#philosophy"
-              className="inline-block px-8 py-4 text-lg font-medium text-text-secondary hover:text-text-primary transition-colors duration-300"
-            >
-              {content.hero.ctaSecondary}
-            </a>
           </motion.div>
         </motion.div>
       </Container>
 
-      {/* Scroll indicator */}
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
         animate={{ y: [0, 10, 0] }}
